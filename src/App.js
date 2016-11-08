@@ -4,15 +4,18 @@ import './App.css';
 const PARAMS = {
     module: 7,
     generator: 3,
-    values: [3, 2, 6, 4, 5, 1],
 };
 
 class LabeledInput extends Component {
     render() {
         return (
-            <div>
-                <label htmlFor={this.props.label}>{this.props.label}</label>
-                <input id={this.props.label} value={this.props.value}/>
+            <div className="labeled-input">
+                <label htmlFor={this.props.id}>{this.props.label}: </label>
+                <input
+                    id={this.props.id}
+                    value={this.props.value}
+                    onChange={this.props.onChange}
+                />
             </div>
         );
     }
@@ -20,7 +23,7 @@ class LabeledInput extends Component {
 
 class ValueRow extends Component {
     render() {
-        return <p>{this.props.value}</p>;
+        return <div className="value-row">{this.props.value}</div>;
     }
 }
 
@@ -31,20 +34,53 @@ class Output extends Component {
         });
 
         return (
-            <p>
+            <div>
                 {rows}
-            </p>
+            </div>
         );
     }
 }
 
 class CircleIDsGenerator extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            module: this.props.params.module,
+            generator: this.props.params.generator
+        };
+    }
+
+    getValues = () => {
+        let values = [];
+        let repeats = {};
+
+        for (let i = 1; i < this.state.module; i += 1) {
+            const next = Math.pow(this.state.generator, i) % this.state.module;
+
+            if (repeats[next]) {
+                values.push('repeat: ' + next);
+            }
+            else {
+                values.push(next);
+            }
+            repeats[next] = true;
+        }
+
+        return values;
+    };
+
+    changeHandler = (event) => {
+        this.setState({
+            [event.target.id]: event.target.value,
+        });
+    };
+
     render() {
         return (
-            <form>
-                <LabeledInput label="module" value={this.props.params.module}/>
-                <LabeledInput label="generator" value={this.props.params.generator}/>
-                <Output values={this.props.params.values}/>
+            <form className="generator">
+                <LabeledInput id="module" label="Module" value={this.state.module} onChange={this.changeHandler}/>
+                <LabeledInput id="generator" label="Generator" value={this.state.generator} onChange={this.changeHandler}/>
+                <Output values={this.getValues()}/>
             </form>
         );
     }
