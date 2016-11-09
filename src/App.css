@@ -27,6 +27,15 @@
     padding-right: 0.3em;
 }
 
-.value-row {
+.warning {
+    color: red;
+}
+
+.setter,
+.output div {
     margin-left: 100px;
+}
+
+.output div {
+    font-family: monospace;
 }

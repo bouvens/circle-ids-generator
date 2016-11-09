@@ -25,11 +25,14 @@ class ValueRow extends Component {
 
 class Output extends Component {
     render() {
+        const startTime = performance.now();
         let values = [];
         let repeats = {};
+        let timeLimit = false;
         let hasRepeats = false;
+        let i = 1;
 
-        for (let i = 1; i < this.props.module; i += 1) {
+        for (; i < this.props.module; i += 1) {
             const next = new BigNumber(this.props.generator)
                 .pow(i)
                 .mod(this.props.module)
@@ -46,17 +49,28 @@ class Output extends Component {
             else {
                 break;
             }
+
+            if ((performance.now() - startTime) / 1000 > this.props.time) {
+                timeLimit = true;
+                break;
+            }
         }
 
-        const rows = values.map(function (value, i) {
-            return <ValueRow value={value} key={i}/>
+        const rows = values.map((value, i) => {
+            const converted = value.toString(this.props.base);
+
+            return <ValueRow value={converted} key={i}/>
         });
 
         return (
-            <div>
+            <div className="output">
+                {
+                    timeLimit &&
+                    <div className="warning">Time limit on {i}th.</div>
+                }
                 {
                     hasRepeats &&
-                    <div>Has repeats.</div>
+                    <div className="warning">Has repeats.</div>
                 }
                 {rows}
             </div>
@@ -80,7 +94,9 @@ class CircleIDsGenerator extends Component {
         this.state = {
             module: 7,
             generator: 3,
-            limit: 1000,
+            idsLimit: 1000,
+            base: 36,
+            timeLimit: 3,
         };
     }
 
@@ -101,6 +117,8 @@ class CircleIDsGenerator extends Component {
         return (
             <form className="generator">
                 <Setter module="7" generator="3" onClick={this.setHandler}/>
+                <Setter module="2176782317" generator="3" onClick={this.setHandler}/>
+                <Setter module="365615844006241" generator="3" onClick={this.setHandler}/>
                 <Setter module="365615844006241" generator="365615844002993" onClick={this.setHandler}/>
                 <LabeledInput
                     id="module"
@@ -115,15 +133,29 @@ class CircleIDsGenerator extends Component {
                     onChange={this.changeHandler}
                 />
                 <LabeledInput
-                    id="limit"
-                    label="Limit"
-                    value={this.state.limit}
+                    id="idsLimit"
+                    label="ID's limit"
+                    value={this.state.idsLimit}
+                    onChange={this.changeHandler}
+                />
+                <LabeledInput
+                    id="base"
+                    label="Base"
+                    value={this.state.base}
+                    onChange={this.changeHandler}
+                />
+                <LabeledInput
+                    id="timeLimit"
+                    label="Time limit"
+                    value={this.state.timeLimit}
                     onChange={this.changeHandler}
                 />
                 <Output
                     module={this.state.module}
                     generator={this.state.generator}
-                    limit={this.state.limit}
+                    limit={this.state.idsLimit}
+                    base={this.state.base}
+                    time={this.state.timeLimit}
                 />
             </form>
         );
