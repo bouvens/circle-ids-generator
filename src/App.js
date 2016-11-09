@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import BigNumber from 'bignumber.js';
 import './App.css';
 
 class LabeledInput extends Component {
@@ -29,7 +30,10 @@ class Output extends Component {
         let hasRepeats = false;
 
         for (let i = 1; i < this.props.module; i += 1) {
-            const next = Math.pow(this.props.generator, i) % this.props.module;
+            const next = new BigNumber(this.props.generator)
+                .pow(i)
+                .mod(this.props.module)
+                .toNumber();
 
             if (repeats[next]) {
                 hasRepeats = true;
@@ -50,11 +54,23 @@ class Output extends Component {
 
         return (
             <div>
-                {hasRepeats &&
-                    <div>Has repeats.</div>}
+                {
+                    hasRepeats &&
+                    <div>Has repeats.</div>
+                }
                 {rows}
             </div>
         );
+    }
+}
+
+class Setter extends Component {
+    render() {
+        return (
+            <div className="setter" onClick={this.props.onClick(this.props.module, this.props.generator)}>
+                <span>Set module={this.props.module} and generator={this.props.generator}</span>
+            </div>
+        )
     }
 }
 
@@ -74,9 +90,18 @@ class CircleIDsGenerator extends Component {
         });
     };
 
+    setHandler = (module, generator) => () => {
+        this.setState({
+            module,
+            generator,
+        });
+    };
+
     render() {
         return (
             <form className="generator">
+                <Setter module="7" generator="3" onClick={this.setHandler}/>
+                <Setter module="365615844006241" generator="365615844002993" onClick={this.setHandler}/>
                 <LabeledInput
                     id="module"
                     label="Module"
