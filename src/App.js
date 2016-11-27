@@ -10,6 +10,25 @@ const DEFAULTS = {
     timeLimit: 3,
 };
 
+const SETTERS = [
+    {
+        module: 7,
+        generator: 3,
+    },
+    {
+        module: 2176782317,
+        generator: 3,
+    },
+    {
+        module: 365615844006241,
+        generator: 3,
+    },
+    {
+        module: 365615844006241,
+        generator: 365615844002993,
+    },
+];
+
 const LabeledInput = props => (
     <div className="labeled-input">
         <label htmlFor={props.id}>{props.label}: </label>
@@ -133,13 +152,17 @@ class CircleIdsGenerator extends React.Component {
         });
     };
 
+    setters = SETTERS.map((setter, index) => <Setter
+        module={setter.module}
+        generator={setter.generator}
+        onClick={this.setHandler}
+        key={index}
+    />);
+
     render() {
         return (
             <form className="generator">
-                <Setter module={7} generator={3} onClick={this.setHandler}/>
-                <Setter module={2176782317} generator={3} onClick={this.setHandler}/>
-                <Setter module={365615844006241} generator={3} onClick={this.setHandler}/>
-                <Setter module={365615844006241} generator={365615844002993} onClick={this.setHandler}/>
+                {this.setters}
                 <LabeledInput
                     id="module"
                     label="Module"
