@@ -33,6 +33,14 @@ const SETTERS = [
     },
 ];
 
+const IDS = {
+    module: 'module',
+    generator: 'generator',
+    idsLimit: 'idsLimit',
+    base: 'base',
+    timeLimit: 'timeLimit',
+}
+
 const LabeledInput = props => (
     <div className="labeled-input">
         <label htmlFor={props.id}>{props.label}: </label>
@@ -77,7 +85,7 @@ const Output = props => {
         }
         repeats[next] = true;
 
-        if (i < props.idsLimit) {
+        if (i <= props.idsLimit) {
             values.push(next);
         }
         else {
@@ -93,7 +101,7 @@ const Output = props => {
     }
 
     const rows = values.map((value, i) => {
-        const converted = value.toString(props.base);
+        const converted = value.toString(Math.max(props.base, 2));
 
         return <ValueRow value={converted} key={i}/>
     });
@@ -140,25 +148,40 @@ class CircleIdsGenerator extends React.Component {
         this.state = DEFAULTS;
     }
 
-    validate (id, value) {
+    static validate(id, value) {
         let validated = value;
 
         while (validated[0] === '0') {
-            validated = validated.slice(1)
+            validated = String(validated).slice(1)
         }
         switch (id) {
-            case 'base':
-                validated = Math.min(validated, 36);
+            case IDS.module:
+                validated = range(validated, 3);
+                break;
+            case IDS.generator:
+                validated = range(validated, 2);
+                break;
+            case IDS.base:
+                validated = range(validated, 1, 36);
                 break;
             default:
         }
 
-        return validated.slice(0,15) || '0'
+        return String(validated).slice(0,15) || '1';
+
+        function range(value, min, max) {
+            let ranged = value;
+
+            ranged = min ? Math.max(ranged, min) : ranged;
+            ranged = max ? Math.min(ranged, max) : ranged;
+
+            return ranged;
+        }
     }
 
     changeHandler = (event) => {
         this.setState({
-            [event.target.id]: this.validate(event.target.id, event.target.value),
+            [event.target.id]: CircleIdsGenerator.validate(event.target.id, event.target.value),
         });
     };
 
@@ -181,31 +204,31 @@ class CircleIdsGenerator extends React.Component {
             <form className="generator">
                 {this.setters}
                 <LabeledInput
-                    id="module"
+                    id={IDS.module}
                     label="Module"
                     value={this.state.module}
                     onChange={this.changeHandler}
                 />
                 <LabeledInput
-                    id="generator"
+                    id={IDS.generator}
                     label="Generator"
                     value={this.state.generator}
                     onChange={this.changeHandler}
                 />
                 <LabeledInput
-                    id="idsLimit"
+                    id={IDS.idsLimit}
                     label="ID's limit"
                     value={this.state.idsLimit}
                     onChange={this.changeHandler}
                 />
                 <LabeledInput
-                    id="base"
+                    id={IDS.base}
                     label="Base"
                     value={this.state.base}
                     onChange={this.changeHandler}
                 />
                 <LabeledInput
-                    id="timeLimit"
+                    id={IDS.timeLimit}
                     label="Time limit"
                     value={this.state.timeLimit}
                     onChange={this.changeHandler}
