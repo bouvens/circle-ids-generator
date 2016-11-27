@@ -155,12 +155,6 @@ class CircleIdsGenerator extends React.Component {
             validated = String(validated).slice(1)
         }
         switch (id) {
-            case IDS.module:
-                validated = range(validated, 3);
-                break;
-            case IDS.generator:
-                validated = range(validated, 2);
-                break;
             case IDS.base:
                 validated = range(validated, 1, 36);
                 break;
@@ -216,15 +210,15 @@ class CircleIdsGenerator extends React.Component {
                     onChange={this.changeHandler}
                 />
                 <LabeledInput
-                    id={IDS.idsLimit}
-                    label="ID's limit"
-                    value={this.state.idsLimit}
-                    onChange={this.changeHandler}
-                />
-                <LabeledInput
                     id={IDS.base}
                     label="Base"
                     value={this.state.base}
+                    onChange={this.changeHandler}
+                />
+                <LabeledInput
+                    id={IDS.idsLimit}
+                    label="ID's limit"
+                    value={this.state.idsLimit}
                     onChange={this.changeHandler}
                 />
                 <LabeledInput
