@@ -149,7 +149,7 @@ class CircleIdsGenerator extends React.Component {
     }
 
     static validate(id, value) {
-        let validated = value;
+        let validated = parseInt(value) || 1;
 
         while (validated[0] === '0') {
             validated = String(validated).slice(1)
@@ -159,6 +159,7 @@ class CircleIdsGenerator extends React.Component {
                 validated = range(validated, 1, 36);
                 break;
             default:
+                validated = range(validated, 1);
         }
 
         return String(validated).slice(0,15) || '1';
