@@ -1,94 +1,82 @@
-import React, {Component} from 'react';
+import React from 'react';
 import BigNumber from 'bignumber.js';
 import './App.css';
 
-class LabeledInput extends Component {
-    render() {
-        return (
-            <div className="labeled-input">
-                <label htmlFor={this.props.id}>{this.props.label}: </label>
-                <input
-                    id={this.props.id}
-                    value={this.props.value}
-                    onChange={this.props.onChange}
-                />
-            </div>
-        );
-    }
-}
+const LabeledInput = props => (
+    <div className="labeled-input">
+        <label htmlFor={props.id}>{props.label}: </label>
+        <input
+            id={props.id}
+            value={props.value}
+            onChange={props.onChange}
+        />
+    </div>
+);
 
-class ValueRow extends Component {
-    render() {
-        return <div className="value-row">{this.props.value}</div>;
-    }
-}
+const ValueRow = props => (
+    <div className="value-row">{props.value}</div>
+);
 
-class Output extends Component {
-    render() {
-        const startTime = performance.now();
-        let values = [];
-        let repeats = {};
-        let timeLimit = false;
-        let hasRepeats = false;
-        let i = 1;
+const Output = props => {
+    const startTime = performance.now();
+    let values = [];
+    let repeats = {};
+    let timeLimit = false;
+    let hasRepeats = false;
+    let i = 1;
 
-        for (; i < this.props.module; i += 1) {
-            const next = new BigNumber(this.props.generator)
-                .pow(i)
-                .mod(this.props.module)
-                .toNumber();
+    for (; i < props.module; i += 1) {
+        const next = new BigNumber(props.generator)
+            .pow(i)
+            .mod(props.module)
+            .toNumber();
 
-            if (repeats[next]) {
-                hasRepeats = true;
-            }
-            repeats[next] = true;
+        if (repeats[next]) {
+            hasRepeats = true;
+        }
+        repeats[next] = true;
 
-            if (i < this.props.limit) {
-                values.push(next);
-            }
-            else {
-                break;
-            }
-
-            if ((performance.now() - startTime) / 1000 > this.props.time) {
-                timeLimit = true;
-                break;
-            }
+        if (i < props.limit) {
+            values.push(next);
+        }
+        else {
+            break;
         }
 
-        const rows = values.map((value, i) => {
-            const converted = value.toString(this.props.base);
-
-            return <ValueRow value={converted} key={i}/>
-        });
-
-        return (
-            <div className="output">
-                {
-                    timeLimit &&
-                    <div className="warning">Time limit on {i}th.</div>
-                }
-                {
-                    hasRepeats &&
-                    <div className="warning">Has repeats.</div>
-                }
-                {rows}
-            </div>
-        );
+        if ((performance.now() - startTime) / 1000 > props.time) {
+            timeLimit = true;
+            break;
+        }
     }
-}
 
-class Setter extends Component {
-    render() {
-        return (
-            <div className="setter" onClick={this.props.onClick(this.props.module, this.props.generator)}>
-                <span>Set module={this.props.module} and generator={this.props.generator}</span>
-            </div>
-        )
-    }
-}
+    const rows = values.map((value, i) => {
+        const converted = value.toString(props.base);
 
-class CircleIDsGenerator extends Component {
+        return <ValueRow value={converted} key={i}/>
+    });
+
+    return (
+        <div className="output">
+            {
+                timeLimit &&
+                <div className="warning">Time limit on {i}th.</div>
+            }
+            {
+                hasRepeats &&
+                <div className="warning">Has repeats.</div>
+            }
+            {rows}
+        </div>
+    );
+};
+
+const Setter = props => (
+    <div className="setter" onClick={props.onClick(props.module, props.generator)}>
+        <span>Set module={props.module} and generator={props.generator}</span>
+    </div>
+);
+
+class CircleIDsGenerator extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -162,12 +150,8 @@ class CircleIDsGenerator extends Component {
     }
 }
 
-class App extends Component {
-    render() {
-        return (
-            <CircleIDsGenerator />
-        );
-    }
-}
+const App = () => (
+    <CircleIDsGenerator />
+);
 
 export default App;
