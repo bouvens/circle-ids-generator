@@ -16,6 +16,10 @@ const SETTERS = [
         generator: 3,
     },
     {
+        module: 11,
+        generator: 7,
+    },
+    {
         module: 2176782317,
         generator: 3,
     },
@@ -136,12 +140,25 @@ class CircleIdsGenerator extends React.Component {
         this.state = DEFAULTS;
     }
 
-    changeHandler = (event) => {
-        while (event.target.value[0] === '0') {
-            event.target.value = event.target.value.slice(1)
+    validate (id, value) {
+        let validated = value;
+
+        while (validated[0] === '0') {
+            validated = validated.slice(1)
         }
+        switch (id) {
+            case 'base':
+                validated = Math.min(validated, 36);
+                break;
+            default:
+        }
+
+        return validated.slice(0,15) || '0'
+    }
+
+    changeHandler = (event) => {
         this.setState({
-            [event.target.id]: event.target.value || '0',
+            [event.target.id]: this.validate(event.target.id, event.target.value),
         });
     };
 
