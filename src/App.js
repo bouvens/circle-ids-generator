@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
-import BigNumber from 'bignumber.js';
-import './App.css';
+import React, { PropTypes } from 'react'
+import BigNumber from 'bignumber.js'
+import './App.css'
 
 const DEFAULTS = {
     module: 7,
@@ -8,7 +8,7 @@ const DEFAULTS = {
     idsLimit: 1000,
     base: 36,
     timeLimit: 3,
-};
+}
 
 const SETTERS = [
     {
@@ -31,7 +31,7 @@ const SETTERS = [
         module: 365615844006241,
         generator: 365615844002993,
     },
-];
+]
 
 const IDS = {
     module: 'module',
@@ -41,70 +41,71 @@ const IDS = {
     timeLimit: 'timeLimit',
 }
 
-const LabeledInput = props => (
+const LabeledInput = (props) => (
     <div className="labeled-input">
         <label htmlFor={props.id}>{props.label}: </label>
         <input
             id={props.id}
-            value={props.value || undefined}
+            value={props.value || null}
             onChange={props.onChange}
         />
     </div>
-);
+)
 
 LabeledInput.propTypes = {
     id: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
+    onChange: PropTypes.func,
+}
 
-const ValueRow = props => (
+const ValueRow = (props) => (
     <div className="value-row">{props.value}</div>
-);
+)
 
 ValueRow.propTypes = {
     value: PropTypes.string.isRequired
-};
+}
 
-const Output = props => {
-    const startTime = performance.now();
-    let values = [];
-    let repeats = {};
-    let timeLimit = false;
-    let hasRepeats = false;
-    let i = 1;
+const Output = (props) => {
+    /* global performance */
+    const startTime = performance.now()
+    const values = []
+    const repeats = {}
+    let timeLimit = false
+    let hasRepeats = false
+    let i = 1
 
     while (i < props.module) {
         const next = new BigNumber(props.generator)
             .pow(i)
             .mod(props.module)
-            .toNumber();
+            .toNumber()
 
         if (repeats[next]) {
-            hasRepeats = true;
+            hasRepeats = true
         }
-        repeats[next] = true;
+        repeats[next] = true
 
         if (i <= props.idsLimit) {
-            values.push(next);
-        }
-        else {
+            values.push(next)
+        } else {
             break
         }
 
         if ((performance.now() - startTime) / 1000 > props.timeLimit) {
-            timeLimit = true;
+            timeLimit = true
             break
         }
 
-        i += 1;
+        i += 1
     }
 
-    const rows = values.map((value, i) => {
-        const converted = value.toString(Math.max(props.base, 2));
+    const rows = values.map((value, index) => {
+        const converted = value.toString(Math.max(props.base, 2))
 
-        return <ValueRow value={converted} key={i}/>
-    });
+        return <ValueRow value={converted} key={index}/>
+    })
 
     return (
         <div className="output">
@@ -119,7 +120,7 @@ const Output = props => {
             {rows}
         </div>
     )
-};
+}
 
 Output.propTypes = {
     module: PropTypes.number,
@@ -127,74 +128,76 @@ Output.propTypes = {
     idsLimit: PropTypes.number,
     base: PropTypes.number,
     timeLimit: PropTypes.number,
-};
+}
 
-Output.defaultProps = DEFAULTS;
+Output.defaultProps = DEFAULTS
 
-const Setter = props => (
-    <div className="setter" onClick={props.onClick(props.module, props.generator)}>
+const Setter = (props) => (
+    <a tabIndex={props.tabIndex} className="setter" onClick={props.onClick(props.module, props.generator)}>
         <span>Set module={props.module} and generator={props.generator}</span>
-    </div>
-);
+    </a>
+)
 
 Setter.propTypes = {
     module: PropTypes.number,
     generator: PropTypes.number,
-};
+    tabIndex: PropTypes.number,
+    onClick: PropTypes.func,
+}
 
 class CircleIdsGenerator extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = DEFAULTS;
+    constructor (props) {
+        super(props)
+        this.state = DEFAULTS
+        this.setters = SETTERS.map((setter, index) => <Setter
+            module={setter.module}
+            generator={setter.generator}
+            onClick={this.setHandler}
+            key={index}
+            tabIndex={index}
+        />)
     }
 
-    static validate(id, value) {
-        let validated = parseInt(value) || 1;
+    static validate (id, value) {
+        function range (number, min = number, max = number) {
+            let ranged = number
+
+            ranged = Math.max(ranged, min)
+            ranged = Math.min(ranged, max)
+
+            return ranged
+        }
+
+        let validated = parseInt(value, 10) || 1
 
         while (validated[0] === '0') {
             validated = String(validated).slice(1)
         }
         switch (id) {
             case IDS.base:
-                validated = range(validated, 1, 36);
-                break;
+                validated = range(validated, 1, 36)
+                break
             default:
-                validated = range(validated, 1);
+                validated = range(validated, 1)
         }
 
-        return String(validated).slice(0,15) || '1';
-
-        function range(value, min, max) {
-            let ranged = value;
-
-            ranged = min ? Math.max(ranged, min) : ranged;
-            ranged = max ? Math.min(ranged, max) : ranged;
-
-            return ranged;
-        }
+        return String(validated).slice(0, 15) || '1'
     }
 
     changeHandler = (event) => {
         this.setState({
             [event.target.id]: CircleIdsGenerator.validate(event.target.id, event.target.value),
-        });
-    };
+        })
+    }
 
     setHandler = (module, generator) => () => {
         this.setState({
             module,
             generator,
-        });
-    };
+        })
+    }
 
-    setters = SETTERS.map((setter, index) => <Setter
-        module={setter.module}
-        generator={setter.generator}
-        onClick={this.setHandler}
-        key={index}
-    />);
-
-    render() {
+    render () {
         return (
             <form className="generator">
                 {this.setters}
@@ -241,7 +244,7 @@ class CircleIdsGenerator extends React.Component {
 }
 
 const App = () => (
-    <CircleIdsGenerator />
-);
+    <CircleIdsGenerator/>
+)
 
-export default App;
+export default App
