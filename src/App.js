@@ -130,10 +130,8 @@ Output.propTypes = {
     timeLimit: PropTypes.number,
 }
 
-Output.defaultProps = DEFAULTS
-
 const Setter = (props) => (
-    <a tabIndex={props.tabIndex} className="setter" onClick={props.onClick(props.module, props.generator)}>
+    <a tabIndex={props.key + 1} className="setter" onClick={props.onClick(props.module, props.generator)}>
         <span>Set module={props.module} and generator={props.generator}</span>
     </a>
 )
@@ -141,7 +139,7 @@ const Setter = (props) => (
 Setter.propTypes = {
     module: PropTypes.number,
     generator: PropTypes.number,
-    tabIndex: PropTypes.number,
+    key: PropTypes.number,
     onClick: PropTypes.func,
 }
 
@@ -154,7 +152,6 @@ class CircleIdsGenerator extends React.Component {
             generator={setter.generator}
             onClick={this.setHandler}
             key={index}
-            tabIndex={index}
         />)
     }
 
