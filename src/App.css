@@ -12,6 +12,7 @@
     color: blue;
     cursor: pointer;
 }
+
 .setter span {
     padding-bottom: 1px;
     border-bottom: 1px dashed;
@@ -37,6 +38,7 @@
 .warning {
     color: red;
 }
+
 .value-row {
     font-family: monospace;
 }

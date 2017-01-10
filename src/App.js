@@ -104,7 +104,7 @@ const Output = (props) => {
     const rows = values.map((value, index) => {
         const converted = value.toString(Math.max(props.base, 2))
 
-        return <ValueRow value={converted} key={index}/>
+        return <ValueRow value={converted} key={index} />
     })
 
     return (
@@ -241,7 +241,7 @@ class CircleIdsGenerator extends React.Component {
 }
 
 const App = () => (
-    <CircleIdsGenerator/>
+    <CircleIdsGenerator />
 )
 
 export default App
